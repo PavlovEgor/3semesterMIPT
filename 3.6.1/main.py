@@ -20,9 +20,9 @@ def approx_curve(x, y):
     plt.plot(x, theoretical_curve(x, param[0]), label=r'')
 
 
-def theoretical_curve(x, a):
-
-    return a * abs(np.sin(np.pi * tau * x) / (np.pi * x))
+def theoretical_curve(x):
+    a = 1.2
+    return a * abs((np.sin(np.pi * tau * (x - nu_0)) / (np.pi * (x - nu_0))) - (np.sin(np.pi * tau * (x + nu_0)) / (np.pi * (x + nu_0))))
 
 
 def get_massive(file_name):
@@ -49,16 +49,18 @@ def curve(x, y):  # paint of Date
     # approx_curve(x, y)
     plt.xlim(left=-5e-1)
     plt.ylim(bottom=0)
-    plt.plot(x, theoretical_curve(x, a=1.4),  label=r'$\frac{\sin{\pi \nu \tau}}{\pi \nu }$')
-    plt.ylabel('Канал A, B')
+    plt.plot(x, theoretical_curve(x),  label=r'формула (6)')
+    plt.ylabel('Произведение A*B, B')
     plt.xlabel('Частота, kГц')
-    plt.title('Спектр импульсных сигналов \n $\\nu_0 = 1 \\;$ кГц,$ \\tau = {} $ мкс'.format(tau * 1e3))
+    plt.title('Спектр цугов \n $\\nu_0 = {} \\;$ кГц,$ \\tau = {} $ мкс, $f = {} \\;$ кГц'.format(nu_0, tau * 1e3, f))
     plt.legend()
     # plt.grid(True)
 
 
-files_address = r'C:\Users\User\Documents\3 семестр\ЭлеМагЛабы\3.6.1\EgorKate\180pulwidth'  # address of txt files
-tau = 180 * 1e-3
+files_address = r'C:\Users\User\Documents\3 семестр\ЭлеМагЛабы\3.6.1\EgorKate\IIIA8B19data2KHZ'  # address of txt files
+tau = 100 * 1e-3
+nu_0 = 30
+f = 2
 files = get_file_names(files_address)
 
 
