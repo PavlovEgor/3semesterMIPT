@@ -43,44 +43,34 @@ def get_massive(file_name):
 
 
 def curve(x, y):  # paint of Date
-    # global tau
-    plt.errorbar(x, y, xerr=0.1, yerr=0.2, fmt='o', c='tab:red', markersize=1)
-    plt.plot(x, y, '-', c='tab:orange')
-    # plt.plot(x, y, '-o', c='tab:red', markersize=1, label='сигнал')
+    global tau
+    # plt.errorbar(x, y, xerr=0.1, yerr=0.2, fmt='o', c='tab:red', markersize=1)
+    plt.plot(x, y, '-o', c='tab:red', markersize=1, label='сигнал')
     # approx_curve(x, y)
-    # plt.xlim(left=-5e-1)
-    # plt.ylim(bottom=0)
-    plt.xlim(left=min(x), right=max(x) + 0.1)
-    plt.ylim(bottom=min(x), top=max(x) + 0.2)
-    # plt.plot(x, theoretical_curve(x, a=1.4),  label=r'$\frac{\sin{\pi \nu \tau}}{\pi \nu }$')
-    # plt.ylabel('Канал A, B')
-    # plt.xlabel('Частота, kГц')
-    plt.ylabel(r'Ширина спектра $\Delta \nu$, кГц')
-    plt.xlabel(r'Обраное время подачи сигнала $1 / \tau$, kГц')
-    plt.title('Зависимость ширины спектра от \n обраного времени подачи сигнала')
-    # plt.title('Спектр импульсных сигналов \n $\\nu_0 = 1 \\;$ кГц,$ \\tau = {} $ мкс'.format(tau * 1e3))
-    # plt.legend()
-    plt.grid(True)
-
-#
-# files_address = r'C:\Users\User\Documents\3 семестр\ЭлеМагЛабы\3.6.1\EgorKate\9data'  # address of txt files
-# tau = 100 * 1e-3
-# files = get_file_names(files_address)
-#
-#
-# x = get_massive(files_address + r'\\' + files[0])[0]
-# y = get_massive(files_address + r'\\' + files[0])[1]
-#
-# for file in files[1::]:
-#     x += get_massive(files_address + r'\\' + file)[0]
-#     y += get_massive(files_address + r'\\' + file)[1]
-#
-# curve(x / len(files), y / len(files))
+    plt.xlim(left=-5e-1)
+    plt.ylim(bottom=0)
+    plt.plot(x, theoretical_curve(x, a=1.4),  label=r'$\frac{\sin{\pi \nu \tau}}{\pi \nu }$')
+    plt.ylabel('Канал A, B')
+    plt.xlabel('Частота, kГц')
+    plt.title('Спектр импульсных сигналов \n $\\nu_0 = 1 \\;$ кГц,$ \\tau = {} $ мкс'.format(tau * 1e3))
+    plt.legend()
+    # plt.grid(True)
 
 
-x = 1 / np.array([40, 60, 80, 100, 120, 140, 160, 180])
-x *= 1e3
-curve(x, x)
+files_address = r'C:\Users\User\Documents\3 семестр\ЭлеМагЛабы\3.6.1\EgorKate\180pulwidth'  # address of txt files
+tau = 180 * 1e-3
+files = get_file_names(files_address)
+
+
+x = get_massive(files_address + r'\\' + files[0])[0]
+y = get_massive(files_address + r'\\' + files[0])[1]
+
+for file in files[1::]:
+    x += get_massive(files_address + r'\\' + file)[0]
+    y += get_massive(files_address + r'\\' + file)[1]
+
+curve(x / len(files), y / len(files))
+
 
 plt.show()
 
