@@ -11,8 +11,8 @@ import os
 files = os.listdir(r'C:\Users\User\Documents\3 семестр\ЭлеМагЛабы\3.3.2')
 
 
-def line(x, a, b):
-    return a * (x) + b
+def line(x, a):
+    return a * x
 
 
 def get_massive(fileName, flag):
@@ -20,11 +20,9 @@ def get_massive(fileName, flag):
     m = file.readlines()
     n = len(m[0].split())
     G = [[] for _ in range(n)]
-    mist = []
     f = 0
     for s in m:
         d = s.split()
-        print(d)
         if d == []:
             f = 1
             continue
@@ -42,30 +40,44 @@ def get_massive(fileName, flag):
     if flag == 'B':
         return (np.array(G[1]))
 
-
-def correction_curve():
-    I = np.array(get_massive(r'C:\Users\User\Documents\3 семестр\ЭлеМагЛабы\3.3.2\1.58A.txt', 'B'))
-    U = np.array(get_massive(r'C:\Users\User\Documents\3 семестр\ЭлеМагЛабы\3.3.2\1.58A.txt', 'I'))
-    #plt.errorbar(x, y, xerr= (5 / 1006), yerr=yerr, label=r'R = 100 Ом', fmt='o', c='tab:red', markersize=0)
-    #plt.errorbar(IR0, BR0, xerr=5 / 1006, yerr=BR02, label=r'R = 0 Ом', fmt='o', c='black', markersize=0)
-    x = U ** (3 / 2)
-    y = I
-    plt.errorbar(x, y, xerr=(0.1 / abs(U)), yerr=0, label=r'R = 100 Ом', fmt='o', c='tab:red', markersize=1)
-    param, param_cov = curve_fit(line, x[16:], y[16:])
-    ax = np.linspace(min(list(x)), max(list(x)), 10)
-    plt.plot(ax, line(ax, param[0], param[1]), label=r'интерполяция')
-    #plt.plot(ax, ax, '--', label=r'теория')
-    #print(param[0])
-    plt.grid(True)
-    # plt.xlim(left=0)
-    # plt.ylim(bottom=0)
-    plt.xlabel(r"Логарифм напряжения, $\ln{U}$")
-    plt.ylabel(r'Логарифм силы тока, $\ln{I}$')
-    plt.title('Вольт-амперная характеристика, $I_n = 1.58 A$')
-    plt.text(-0.5, 7, '$k = {}$, по напряжению\n с {} В по {} В'.format(round(param[0], 3), U[16], U[-1]), fontsize=15)
-    # print(param[0])
+k = []
+def correction_curve(fileName):
+    I = np.array(get_massive(r'C:\Users\User\Documents\3 семестр\ЭлеМагЛабы\3.3.2\{}'.format(fileName), 'B'))
+    U = np.array(get_massive(r'C:\Users\User\Documents\3 семестр\ЭлеМагЛабы\3.3.2\{}'.format(fileName), 'I'))
+    x = U[16:] ** (3 / 2)
+    y = I[16:]
+    plt.errorbar(x, y, xerr=(0.1 * (3/2) * (U[16:] ** 0.5)), yerr=0, fmt='o', c='tab:red', markersize=1)
+    param, param_cov = curve_fit(line, x, y)
+    ax = np.linspace(0, max(list(x)), 10)
+    plt.plot(ax, line(ax, param[0]), label=r'$I = {}$, k = {}'.format(fileName[:-4], round(param[0], 3)))
+    k.append(param[0])
 
 
 
-correction_curve()
+print(files)
+for name in files:
+    if name[-1] != 't':
+        continue
+    correction_curve(name)
+    print(name)
+
+plt.xlabel(r"$U^{3/2}$")
+plt.ylabel(r'Сила тока, мкА')
+plt.title('Вольт-амперная характеристика')
+plt.grid(True)
+plt.xlim(left=0)
+plt.ylim(bottom=0)
+plt.legend()
 plt.show()
+
+ra = 9.5
+eps0 = 8.85 * 1e-12
+l = 9
+a1 = 9 * ra * (k[3] * 1e-6)
+a2 = 8 * np.pi * eps0 * l
+a3 = (a1 / a2)**2
+print(0.5 * a3 * 1e-11 * 0.16, 0.5 * a3 * 1e-11)
+
+
+
+

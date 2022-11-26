@@ -16,13 +16,13 @@ def get_file_names(files_address):
 
 def approx_curve(x, y):
     param, param_cov = curve_fit(theoretical_curve, x, y)
-    # ax = np.linspace(0, max(list(x)), 10)
-    plt.plot(x, theoretical_curve(x, param[0]), label=r'')
+    ax = np.linspace(0, max(x), 3)
+    plt.plot(ax, theoretical_curve(ax, param[0]), label=r'')
+    print(param)
 
 
-def theoretical_curve(x):
-    a = 1.2
-    return a * abs((np.sin(np.pi * tau * (x - nu_0)) / (np.pi * (x - nu_0))) - (np.sin(np.pi * tau * (x + nu_0)) / (np.pi * (x + nu_0))))
+def theoretical_curve(x, a):
+    return a * x
 
 
 def get_massive(file_name):
@@ -43,37 +43,29 @@ def get_massive(file_name):
 
 
 def curve(x, y):  # paint of Date
-    global tau
+    # global tau
     # plt.errorbar(x, y, xerr=0.1, yerr=0.2, fmt='o', c='tab:red', markersize=1)
-    plt.plot(x, y, '-o', c='tab:red', markersize=1, label='сигнал')
-    # approx_curve(x, y)
-    plt.xlim(left=-5e-1)
+    plt.plot(x, y, 'o', c='tab:orange')
+    plt.xlim(left=0)
     plt.ylim(bottom=0)
-    # plt.plot(x, theoretical_curve(x),  label=r'формула (6)')
-    plt.ylabel('Произведение A*B, B')
-    plt.xlabel('Частота, kГц')
-    plt.title('Спектр цугов \n $\\nu_0 = {} \\;$ кГц,$ \\tau = {} $ мкс, $f = {} \\;$ кГц'.format(nu_0, tau * 1e3, f))
-    plt.legend()
-    # plt.grid(True)
+    plt.ylabel(r'Отношение средней гармоники к боковой')
+    plt.xlabel(r'Глубина модуляции $m$')
+    plt.title('Зависимость спектра модулированного \n сигнала от глубины модуляции, k = 0.506')
+    # plt.title('Спектр импульсных сигналов \n $\\nu_0 = 1 \\;$ кГц,$ \\tau = {} $ мкс'.format(tau * 1e3))
+    # plt.legend()
+    plt.grid(True)
 
 
-files_address = r'C:\Users\User\Documents\3 семестр\ЭлеМагЛабы\3.6.1\EgorKate\IV200AMPL'  # address of txt files
-tau = 100 * 1e-3
-nu_0 = 30
-f = 2
+files_address = r'C:\Users\User\Documents\3 семестр\ЭлеМагЛабы\3.6.1'  # address of txt files
 files = get_file_names(files_address)
 
+A_max = get_massive(files_address + r'\\' + files[0])[3]
+A_min = get_massive(files_address + r'\\' + files[0])[4]
+osc_max = get_massive(files_address + r'\\' + files[0])[1]
+osc_min = get_massive(files_address + r'\\' + files[0])[2]
 
-x = get_massive(files_address + r'\\' + files[0])[0]
-y = get_massive(files_address + r'\\' + files[0])[1]
-
-for file in files[1::]:
-    x += get_massive(files_address + r'\\' + file)[0]
-    y += get_massive(files_address + r'\\' + file)[1]
-
-curve(x / len(files), y / len(files))
-
-
+x = (A_max - A_min) / (A_max + A_min)
+y = osc_min / osc_max
+curve(x, y)
+approx_curve(x, y)
 plt.show()
-
-
