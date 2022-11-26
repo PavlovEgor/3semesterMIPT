@@ -4,8 +4,6 @@ import matplotlib.animation as animation
 
 
 
-
-
 class Quaternion:
 
     def __init__(self, a=0, b=1, c=0, d=0):  # a + bi + cj + dk
@@ -50,4 +48,27 @@ class Quaternion:
         self.i = vec[0]
         self.j = vec[1]
         self.k = vec[2]
+
+
+class EulerAngles:
+
+    def __init__(self, psi=0, phi=0, teta=0, psidot=0, phidot=0, tetadot=0):
+        self.psi = psi
+        self.phi = phi
+        self.teta = teta
+        self.psidot = psidot
+        self.phidot = phidot
+        self.tetadot = tetadot
+
+    def omega(self):
+        p = self.psidot * np.sin(self.teta) * np.sin(self.phi) + self.tetadot * np.cos(self.phi)
+        q = self.psidot * np.sin(self.teta) * np.cos(self.phi) - self.tetadot * np.sin(self.phi)
+        r = self.phidot + self.psidot * np.cos(self.teta)
+
+
+class MomentOfInertia:
+
+    def __init__(self, A, B, C, D=0, E=0, F=0):
+        self.tenz = np.array([[A, -E, -D], [-E, B, -F], [-D, -F, C]])
+        self.diag = np.array([A, B, C])
 
