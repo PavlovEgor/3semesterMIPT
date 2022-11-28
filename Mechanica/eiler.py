@@ -65,10 +65,150 @@ class EulerAngles:
         q = self.psidot * np.sin(self.teta) * np.cos(self.phi) - self.tetadot * np.sin(self.phi)
         r = self.phidot + self.psidot * np.cos(self.teta)
 
+        return np.array([p, q, r])
+
+    def axis(self):
+        kx = -np.sin(self.psi) * np.sin(self.teta)
+        ky = np.cos(self.psi) * np.sin(self.teta)
+        kz = np.cos(self.teta)
+        return Quaternion(0, kx, ky, kz)
+
 
 class MomentOfInertia:
 
     def __init__(self, A, B, C, D=0, E=0, F=0):
         self.tenz = np.array([[A, -E, -D], [-E, B, -F], [-D, -F, C]])
         self.diag = np.array([A, B, C])
+        self.A = A
+        self.B = B
+        self.C = C
+
+
+class Plane: # плоскость
+
+    def __init__(self, n): # определяется нормалью проходит через начало координат
+        self.n = n
+
+    def circle(self, m=5, r=0.5): # m точек на окружности радиуса r
+        n = self.n
+        axis, q = Quaternion(), Quaternion()
+        axis.get_arg_and_vec((2 * np.pi) / (m * 2), n)
+        a = np.array([n[1], -n[0], 0])  # какй-то вектор лежащий в плоскости
+        a = r * (a / np.linalg.norm(a))
+        q.vec = a
+        X, Y, Z = [a[0]], [a[1]], [a[2]]
+
+        for _ in range(m):
+            q = q.rot(axis)
+            v = q.vec
+            X.append(v[0])
+            Y.append(v[1])
+            Z.append(v[2])
+
+        return [X, Y, Z]
+
+
+class Movement():
+
+    R = 0.5
+    l = ((3 ** 0.5) / 2) * R
+    g = 9.8
+    m = 1
+
+    A = ((m * (R ** 2)) / 4) + (m * (l ** 2))
+    C = ((m * (R ** 2)) / 2)
+    dt = 1 / 16
+
+    psi0 = phi0 = psidot0 = tetadot0 = 0
+    teta0 = np.pi / 6
+    phidot0 = 4 * ((g / R) ** 2)
+
+    alfa = (A / (C * phidot0))
+    beta = 2 * A * m * g * l / ((C * phidot0) ** 2)
+
+    def __init__(self, psi=0, phi=0, teta=0):
+        self.teta = teta
+
+    def increment(self):
+
+
+        dteta = (((np.cos(teta0) - np.cos(self.teta)) *
+                 (beta * (np.sin(self.teta) ** 2) - (np.cos(teta0) - np.cos(self.teta))) /
+                 (np.sin(self.teta) ** 2)) ** 0.5) * dt
+
+        self.teta += dteta
+
+    def psidot(self):
+        x = ((g / R) ** 0.5) * ((2 - (3 ** 0.5) * np.cos(self.teta) + 2 * (np.sin(self.teta) ** 2)) /
+                                (np.sin(self.teta) ** 2))
+        return  x
+
+    def phidot(self):
+        x = ((g / R) ** 0.5) * (((3 ** 0.5)   - 2 * np.cos(self.teta) ) /
+                                (np.sin(self.teta) ** 2))
+        return x
+
+
+
+
+
+
+
+# p = Plane(np.array([1, 1, 1]))
+# cir = p.circle()
+
+
+fig = plt.figure()
+ax = fig.add_subplot(projection='3d')
+
+ax.set_xlim(-1, 1)
+ax.set_ylim(-1, 1)
+ax.set_zlim(-1, 1)
+
+# ax.scatter(cir[0], cir[1], cir[2])
+# print(cir)
+plt.show()
+
+
+def one_vec_aninate():
+    global k
+
+
+    k = k.rot(q)
+
+    line.set_data([0, ex.i], [0, ex.j])
+    line.set_3d_properties([0, ex.k])
+
+
+
+
+count = 0
+
+fig = plt.figure()
+ax = fig.add_subplot(projection='3d')
+
+greekSystem = EulerAngles()  # подвижный базис в углах Эйлера
+k = greekSystem.axis() # ось симметрии тела (О дзета)
+z = Quaternion(0, 0, 0, 1)
+
+line, = ax.plot([0, ex.i], [0, ex.j], [0, ex.k], c='tab:red', label="x'")
+
+
+ax.set_xlim(-1, 1)
+ax.set_ylim(-1, 1)
+ax.set_zlim(-1, 1)
+ax.set_xlabel('x')
+ax.set_ylabel('y')
+ax.set_zlabel('z')
+
+ax.plot([0], [0], [0], 'o', c='tab:red')
+
+args = np.array([np.pi / 6, np.pi / 4, np.pi / 6])
+
+n = 50
+interval, nframes = 0.1, n * len(args)
+
+anim2 = animation.FuncAnimation(fig, one_vec_aninate, frames=nframes, interval=interval, repeat=False)
+plt.legend()
+plt.show()
 
